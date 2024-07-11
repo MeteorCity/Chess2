@@ -19,16 +19,19 @@ class Piece(ABC):
     def move(self, moveRank, moveColumn):
         # self.board.printBoard()
         if self.isLegal(moveRank, moveColumn):
-            # Find all the valid moves after the move is played
-            self.board.findAllValidMoves()
+            oppositeColor = "white" if self.color == "black" else "black"
+            if self.board.isKingInCheckmate(oppositeColor):
+                print(f"{oppositeColor} is in checkmate!")
         else:
-            print("Illegal move")
+            print(f"Illegal move: {type(self).__name__} {self.rank, self.column} to {moveRank, moveColumn}")
     
-    def isLegal(self, moveRank, moveColumn):
+    def isLegal(self, moveRank, moveColumn, movePiecesBack=False):
         '''
         Given the move coordinates, this function returns whether the move
         is legal or not. If the move is legal, it plays the move and returns
         True. Otherwise, it returns False.
+        If the movePiecesBackFlag is set to True, then the board will be reset
+        no matter if the move is legal or not.
         '''
         assert moveRank > -1 and moveRank < 8 and moveColumn > -1 and moveColumn < 8, "move out of bounds"
 
@@ -49,12 +52,15 @@ class Piece(ABC):
         # Check if after the move our king is in check
         inCheck = self.board.isKingInCheck(self.color)
 
-        # Reset board to position before move if move was illegal
-        if inCheck:
+        # Reset board to position before move if illegal move or flag was used
+        if inCheck or movePiecesBack:
             self.rank = oldRank
             self.column = oldColumn
             self.board.board[self.rank][self.column].piece = self
             self.board.board[moveRank][moveColumn].piece = moveToPiece
+        
+        # Reset the valid moves
+        self.board.findAllValidMoves()
 
         return not inCheck
     

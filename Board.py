@@ -88,19 +88,57 @@ class Board:
         self.board[orig_rank][orig_column].piece = None
         self.board[new_rank][new_column].piece = piece
     
-    def isKingInCheck(self, color):
+    def kingHelper(self, color):
         '''
-        Returns True or False based on the whether the king of the passed
-        in color is in check or not.
+        A helper function for the inCheck, inCheckmate, and inStalemate
+        functions. Returns the squares the opponent is attacking and the
+        King object of the given color.
         '''
         oppAttacks = []
-        kingLocation = None
+        king = None
 
         for i in range(8):
             for j in range(8):
                 if (piece := self.board[i][j].piece) and piece.color != color:
-                    oppAttacks.extend(piece.validMoves)
+                    # Prevent forward pawn squares from being added to oppAttacks
+                    if type(piece).__name__ == "Pawn":
+                        attackMoves = list(filter(lambda x: x[1] != piece.column, piece.validMoves))
+                        oppAttacks.extend(attackMoves)
+                    else:
+                        oppAttacks.extend(piece.validMoves)
                 elif piece and piece.color == color and type(piece).__name__ == "King":
-                    kingLocation = (i, j)
+                    king = piece
         
-        return kingLocation in oppAttacks
+        assert king is not None, "King is missing from the board"
+        return oppAttacks, king
+    
+    def isKingInCheck(self, color):
+        '''
+        Returns True or False based on whether the king of the passed
+        in color is in check or not.
+        '''
+        oppAttacks, king = self.kingHelper(color)
+        return (king.rank, king.column) in oppAttacks
+    
+    def isKingInCheckmate(self, color):
+        '''
+        Returns True or False based on whether the king of the passed
+        in color is in checkmate or not.
+        '''
+        oppAttacks, king = self.kingHelper(color)
+        
+        # King in check
+        if (king.rank, king.column) in oppAttacks:
+            for i in range(-1, 2):
+                for j in range(-1, 2):
+                    # Exclude king's starting square
+                    if i == 0 and j == 0:
+                        continue
+                    
+                    if (0 <= king.rank + i <= 7 and 0 <= king.column + j <= 7 and
+                    king.isLegal(king.rank + i, king.column + j, True)):
+                        return False
+        else:
+            return False
+
+        return True
