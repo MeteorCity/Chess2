@@ -25,17 +25,19 @@ class Piece(ABC):
         else:
             print(f"Illegal move: {type(self).__name__} {self.rank, self.column} to {moveRank, moveColumn}")
     
-    def isLegal(self, moveRank, moveColumn, movePiecesBack=False):
+    def isLegal(self, moveRank, moveColumn, movePiecesBack=False, ignoreValidity=False):
         '''
         Given the move coordinates, this function returns whether the move
         is legal or not. If the move is legal, it plays the move and returns
         True. Otherwise, it returns False.
-        If the movePiecesBackFlag is set to True, then the board will be reset
+        If the movePiecesBack flag is set to True, then the board will be reset
         no matter if the move is legal or not.
+        If the ignoreValidity flag is set to True, then it doesn't matter if 
+        the given move is in validMoves or not.
         '''
         assert moveRank > -1 and moveRank < 8 and moveColumn > -1 and moveColumn < 8, "move out of bounds"
 
-        if (moveRank, moveColumn) not in self.validMoves:
+        if not ignoreValidity and (moveRank, moveColumn) not in self.validMoves:
             return False
 
         # Store the piece on the square we're moving to

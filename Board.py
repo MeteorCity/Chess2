@@ -94,6 +94,8 @@ class Board:
         functions. Returns the squares the opponent is attacking and the
         King object of the given color.
         '''
+        assert color == "white" or color == "black", "color must be white or black"
+
         oppAttacks = []
         king = None
 
@@ -141,4 +143,40 @@ class Board:
         else:
             return False
 
+        return True
+    
+    def canCastle(self, color, side):
+        '''
+        Returns True or False based on whether the king of the passed
+        in color can castle on the passed in side.
+        '''
+        assert side == "kingside" or side == "queenside", "side must be kingside or queenside"
+
+        rookCol = 7 if side == "kingside" else 0
+        rank = 0 if color == "black" else 7
+
+        # If the king or the rook aren't on their starting locations, return False
+        if (type(self.board[rank][4].piece).__name__ != "King" or
+            type(self.board[rank][rookCol].piece).__name__ != "Rook"):
+            return False
+        
+        king = self.board[rank][4].piece
+        rook = self.board[rank][rookCol].piece
+        
+        # If the king or rook has moved, return False
+        if (king.has_moved or rook.has_moved):
+            return False
+        
+        # If the king is currently in check, return False
+        if self.isKingInCheck(color):
+            return False
+
+        # If there are pieces in the way or the king will castle into
+        # or through check, return False
+        for i in range(1, 3):
+            offset = i if side == "kingside" else -i
+            if (self.board[rank][4 + offset].piece is not None or
+                not king.isLegal(rank, 4 + offset, True, True)):
+                return False
+        
         return True

@@ -87,15 +87,15 @@ pygame.quit()
 
 board = Board()
 
-
+'''
 board.board[6][4].piece.move(4, 4) # e4
 board.board[1][2].piece.move(3, 2) # c5
 board.board[4][4].piece.move(3, 4) # e5
 board.board[1][3].piece.move(2, 3) # d6
 board.board[3][4].piece.move(2, 3) # exd6
 board.board[0][1].piece.move(2, 2) # Nc6
-board.board[6][3].piece.move(4, 3) # d5
-board.board[2][2].piece.move(4, 3) # Nxd5
+board.board[6][3].piece.move(4, 3) # d4
+board.board[2][2].piece.move(4, 3) # Nxd4
 board.board[7][4].piece.move(6, 3) # Kd2
 board.board[0][2].piece.move(3, 5) # Bf5
 board.board[7][5].piece.move(2, 0) # Ba6
@@ -107,10 +107,22 @@ board.board[3][7].piece.move(1, 5) # Qxf7+
 board.board[0][4].piece.move(1, 3) # Kd7
 board.board[1][5].piece.move(3, 5) # Qxf5+
 board.board[4][3].piece.move(3, 5) # Nxf5
+'''
 
 #board.board[6][5].piece.move(4, 5) # f4
 #board.board[1][4].piece.move(3, 4) # e5
 #board.board[6][6].piece.move(4, 6) # g4
 #board.board[0][3].piece.move(4, 7) # Qh4#
 
+board.board[6][4].piece.move(4, 4) # e4
+board.board[1][3].piece.move(3, 3) # d5
+board.board[7][5].piece.move(2, 0) # Ba6
+board.board[0][1].piece.move(2, 0) # Nxa6
+board.board[7][6].piece.move(5, 5) # Nf3
+board.board[0][2].piece.move(4, 6) # Bg4
+board.board[7][4].piece.move(7, 6) # 0-0
+board.printBoard()
+board.board[0][3].piece.move(2, 3) # Qd6
+board.board[7][5].piece.move(7, 4) # Re1
+board.board[0][4].piece.move(0, 2) # 0-0-0
 board.printBoard()

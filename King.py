@@ -26,5 +26,36 @@ class King(Piece):
                         self.validMoves.append((self.rank + i, self.column + j))
         
     def move(self, moveRank, moveColumn):
-        super().move(moveRank, moveColumn)
+        # Queenside castle
+        if (self.rank == moveRank and self.column - moveColumn == 2 and
+        self.board.canCastle(f"{self.color}", "queenside")):
+            # Update king's position
+            self.board.updateBoard(self.rank, self.column, moveRank, moveColumn)
+            self.column = moveColumn
+
+            # Update rook's position
+            rook = self.board.board[self.rank][0].piece
+            self.board.updateBoard(rook.rank, rook.column, self.rank, 3)
+            rook.column = 3
+            
+            # Find new valid moves
+            self.board.findAllValidMoves()
+        
+        # Kingside Castle
+        elif (self.rank == moveRank and self.column - moveColumn == -2 and
+        self.board.canCastle(f"{self.color}", "kingside")):
+            # Update king's position
+            self.board.updateBoard(self.rank, self.column, moveRank, moveColumn)
+            self.column = moveColumn
+
+            # Update rook's position
+            rook = self.board.board[self.rank][7].piece
+            self.board.updateBoard(rook.rank, rook.column, self.rank, 5)
+            rook.column = 5
+
+            # Find new valid moves
+            self.board.findAllValidMoves()
+        else:
+            super().move(moveRank, moveColumn)
+        
         self.has_moved = True
