@@ -90,9 +90,9 @@ class Board:
     
     def kingHelper(self, color):
         '''
-        A helper function for the inCheck, inCheckmate, and inStalemate
-        functions. Returns the squares the opponent is attacking and the
-        King object of the given color.
+        A helper function for the inCheck and inCheckmate functions.
+        Returns the squares the opponent is attacking and the King object
+        of the given color.
         '''
         assert color == "white" or color == "black", "color must be white or black"
 
@@ -102,12 +102,7 @@ class Board:
         for i in range(8):
             for j in range(8):
                 if (piece := self.board[i][j].piece) and piece.color != color:
-                    # Prevent forward pawn squares from being added to oppAttacks
-                    if type(piece).__name__ == "Pawn":
-                        attackMoves = list(filter(lambda x: x[1] != piece.column, piece.validMoves))
-                        oppAttacks.extend(attackMoves)
-                    else:
-                        oppAttacks.extend(piece.validMoves)
+                    oppAttacks.extend(piece.validMoves)
                 elif piece and piece.color == color and type(piece).__name__ == "King":
                     king = piece
         
@@ -142,6 +137,20 @@ class Board:
                         return False
         else:
             return False
+
+        return True
+    
+    def isKingInStalemate(self, color):
+        '''
+        Returns True or False based on whether the king of the passed
+        in color is in stalemate or not.
+        '''
+        for i in range(8):
+            for j in range(8):
+                if (piece := self.board[i][j].piece) and piece.color == color:
+                    for validMoveRank, validMoveCol in piece.validMoves:
+                        if piece.isLegal(validMoveRank, validMoveCol, True):
+                            return False
 
         return True
     

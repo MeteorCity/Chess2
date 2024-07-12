@@ -55,6 +55,8 @@ class King(Piece):
 
             # Find new valid moves
             self.board.findAllValidMoves()
+
+        # Non-castle move
         else:
             super().move(moveRank, moveColumn)
         

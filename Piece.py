@@ -22,6 +22,8 @@ class Piece(ABC):
             oppositeColor = "white" if self.color == "black" else "black"
             if self.board.isKingInCheckmate(oppositeColor):
                 print(f"{oppositeColor} is in checkmate!")
+            if self.board.isKingInStalemate(oppositeColor):
+                print(f"{oppositeColor} is in stalemate!")
         else:
             print(f"Illegal move: {type(self).__name__} {self.rank, self.column} to {moveRank, moveColumn}")
     

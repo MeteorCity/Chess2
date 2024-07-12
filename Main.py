@@ -114,6 +114,7 @@ board.board[4][3].piece.move(3, 5) # Nxf5
 #board.board[6][6].piece.move(4, 6) # g4
 #board.board[0][3].piece.move(4, 7) # Qh4#
 
+'''
 board.board[6][4].piece.move(4, 4) # e4
 board.board[1][3].piece.move(3, 3) # d5
 board.board[7][5].piece.move(2, 0) # Ba6
@@ -121,8 +122,29 @@ board.board[0][1].piece.move(2, 0) # Nxa6
 board.board[7][6].piece.move(5, 5) # Nf3
 board.board[0][2].piece.move(4, 6) # Bg4
 board.board[7][4].piece.move(7, 6) # 0-0
-board.printBoard()
 board.board[0][3].piece.move(2, 3) # Qd6
 board.board[7][5].piece.move(7, 4) # Re1
 board.board[0][4].piece.move(0, 2) # 0-0-0
+'''
+
+board.board[6][4].piece.move(5, 4) # e3
+board.board[1][0].piece.move(3, 0) # a5
+board.board[7][3].piece.move(3, 7) # Qh5
+board.board[0][0].piece.move(2, 0) # Ra6
+board.board[3][7].piece.move(3, 0) # Qxa5
+board.board[1][7].piece.move(3, 7) # h5
+board.board[6][7].piece.move(4, 7) # h4
+board.board[2][0].piece.move(2, 7) # Rah6
+board.board[3][0].piece.move(1, 2) # Qxc7
+board.board[1][5].piece.move(2, 5) # f6
+board.board[1][2].piece.move(1, 3) # Qxd7+
+board.board[0][4].piece.move(1, 5) # Kf7
+board.board[1][3].piece.move(1, 1) # Qxb7
+board.board[0][3].piece.move(5, 3) # Qd3
+board.board[1][1].piece.move(0, 1) # Qxb8
+board.board[5][3].piece.move(1, 7) # Qh7
+board.board[0][1].piece.move(0, 2) # Qxc8
+board.board[1][5].piece.move(2, 6) # Kg6
+board.board[0][2].piece.move(2, 4) # Qe6
+
 board.printBoard()
