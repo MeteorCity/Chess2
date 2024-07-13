@@ -17,17 +17,10 @@ class Piece(ABC):
         print(f"The piece is a {self.color} {type(self).__name__} on rank {self.rank}, column {self.column}")
 
     def move(self, moveRank, moveColumn):
+        moveToPiece = self.board.board[moveRank][moveColumn].piece
         # self.board.printBoard()
         if self.isLegal(moveRank, moveColumn):
-            oppositeColor = "white" if self.color == "black" else "black"
-            if self.board.isKingInCheckmate(oppositeColor): # Checkmate
-                print(f"{oppositeColor} is in checkmate!")
-            if self.board.isKingInStalemate(oppositeColor): # Stalemate
-                print(f"{oppositeColor} is in stalemate!")
-            fenString = self.board.posToFEN(self.board.board) # 3-move rep
-            self.board.positions[fenString] += 1
-            if self.board.positions[fenString] >= 3:
-                print("Game is a draw by 3-time position repeat.")
+            self.board.checkEndings(self, moveToPiece)
         else:
             print(f"Illegal move: {type(self).__name__} {self.rank, self.column} to {moveRank, moveColumn}")
     

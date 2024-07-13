@@ -15,6 +15,7 @@ class Board:
         self.setupBoard()
         self.findAllValidMoves()
         self.positions = defaultdict(int)
+        self.fiftyMoveCounter = 0
     
     def setupBoard(self):
         '''
@@ -148,6 +149,9 @@ class Board:
         Returns True or False based on whether the king of the passed
         in color is in stalemate or not.
         '''
+        if self.isKingInCheck(color):
+            return False
+
         for i in range(8):
             for j in range(8):
                 if (piece := self.board[i][j].piece) and piece.color == color:
@@ -229,3 +233,33 @@ class Board:
             fen[i] += "/"
         
         return "".join(fen)[:-1]
+    
+    def checkEndings(self, piece, moveToPiece):
+        '''
+        Checks if the conditions for a game to end have been met. Checks
+        for checkmate, stalemate, 3-move position repeat, and 50-move rule
+        draw.
+        '''
+        oppositeColor = "white" if piece.color == "black" else "black"
+
+        # Checkmate
+        if self.isKingInCheckmate(oppositeColor):
+            print(f"{oppositeColor} is in checkmate!")
+
+        # Stalemate
+        if self.isKingInStalemate(oppositeColor):
+            print(f"{oppositeColor} is in stalemate!")
+        
+        # 3-move repetition
+        fenString = self.posToFEN(self.board)
+        self.positions[fenString] += 1
+        if self.positions[fenString] == 3:
+            print("Game is a draw by 3-time position repeat.")
+
+        # 50-move draw
+        if moveToPiece is not None or type(piece).__name__ == "Pawn":
+            self.fiftyMoveCounter = 0
+        else:
+            self.fiftyMoveCounter += 0.5
+        if self.fiftyMoveCounter == 50:
+            print("Game is a draw by 50-move rule.")
