@@ -26,6 +26,10 @@ class King(Piece):
                         self.validMoves.append((self.rank + i, self.column + j))
         
     def move(self, moveRank, moveColumn):
+        '''
+        Overrides the move function of the piece class such that castling
+        can be implemented.
+        '''
         # Queenside castle
         if (self.rank == moveRank and self.column - moveColumn == 2 and
         self.board.canCastle(f"{self.color}", "queenside")):

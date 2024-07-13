@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 from Square import Square
 from Piece import Piece
 from Rook import Rook
@@ -12,6 +14,7 @@ class Board:
         self.board = [[None for _ in range(8)] for _ in range(8)]
         self.setupBoard()
         self.findAllValidMoves()
+        self.positions = defaultdict(int)
     
     def setupBoard(self):
         '''
@@ -165,6 +168,7 @@ class Board:
         rank = 0 if color == "black" else 7
 
         # If the king or the rook aren't on their starting locations, return False
+        # TODO might have to change this to avoid error None object doesn't contain attribute __name__
         if (type(self.board[rank][4].piece).__name__ != "King" or
             type(self.board[rank][rookCol].piece).__name__ != "Rook"):
             return False
@@ -189,3 +193,39 @@ class Board:
                 return False
         
         return True
+    
+    def posToFEN(self, board):
+        '''
+        Takes in a 2d array representing the board and returns a FEN string
+        of the corresponding position.
+        Currently only piece placement will be implemented but, if necessary,
+        more fields will be introduced in the future for active color, castling
+        rights, etc.
+        '''
+        fen = ["" for _ in range(8)]
+        spaceCounter = 0
+
+        for i in range(8):
+            for j in range(8):
+                if (piece := board[i][j].piece):
+                    name = type(piece).__name__
+                    letter = ""
+                    if name == "Knight":
+                        letter = name[1].upper() if piece.color == "white" else name[1]
+                    else:
+                        letter = name[0].lower() if piece.color == "black" else name[0]
+                    
+                    if spaceCounter == 0:
+                        fen[i] += letter
+                    else:
+                        fen[i] += str(spaceCounter) + letter
+                    spaceCounter = 0
+                else:
+                    spaceCounter += 1
+
+            if spaceCounter != 0:
+                fen[i] += str(spaceCounter)
+            spaceCounter = 0
+            fen[i] += "/"
+        
+        return "".join(fen)[:-1]
