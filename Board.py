@@ -55,7 +55,8 @@ class Board:
                     if j == 4:
                         piece = King("white", i, j, self)
                 
-                square = Square(piece, i, j)
+                squareColor = "white" if (i + j) % 2 == 0 else "black"
+                square = Square(piece, i, j, squareColor)
                 self.board[i][j] = square
     
     def findAllValidMoves(self):

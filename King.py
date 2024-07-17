@@ -64,4 +64,5 @@ class King(Piece):
         else:
             super().move(moveRank, moveColumn)
         
+        
         self.has_moved = True

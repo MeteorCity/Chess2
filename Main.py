@@ -1,91 +1,110 @@
-# import pygame
+import pygame as pg
+from pygame.locals import *
+import sys
+import chess
+import chess.svg
+import io
+
 from Board import Board
 
-'''
-pygame.init()
+# Initialize pygame
+pg.init()
 
-# Set up the display
-width, height = 800, 800
-square_size = width // 8
-window = pygame.display.set_mode((width, height))
-pygame.display.set_caption("Chess")
+# Constants
+WIDTH, HEIGHT = 640, 640
+SQUARE_SIZE = WIDTH // 8
 
-# Load piece images
-piece_images = {}
-def load_images():
-    pieces = ['pawn', 'rook', 'knight', 'bishop', 'queen', 'king']
-    colors = ['white', 'black']
-    for piece in pieces:
-        for color in colors:
-            image_path = f'icons/{color}-{piece}.svg'
-            piece_images[f'{color}-{piece}'] = pygame.transform.scale(pygame.image.load(image_path), (square_size, square_size))
+# Colors
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+LIGHT_SQUARE_COLOR = (240, 217, 181)
+DARK_SQUARE_COLOR = (181, 136, 99)
 
-load_images()
+# Images
+img_dict = {
+    "w_Rook": pg.image.load('icons/white-rook.png'),
+    "w_Knight": pg.image.load('icons/white-knight.png'),
+    "w_Bishop": pg.image.load('icons/white-bishop.png'),
+    "w_Queen": pg.image.load('icons/white-queen.png'),
+    "w_King": pg.image.load('icons/white-king.png'),
+    "w_Pawn": pg.image.load('icons/white-pawn.png'),
+    "b_Rook": pg.image.load('icons/black-rook.png'),
+    "b_Knight": pg.image.load('icons/black-knight.png'),
+    "b_Bishop": pg.image.load('icons/black-bishop.png'),
+    "b_Queen": pg.image.load('icons/black-queen.png'),
+    "b_King": pg.image.load('icons/black-king.png'),
+    "b_Pawn": pg.image.load('icons/black-pawn.png'),
+}
 
-# Draw the board
-def draw_board(window, board):
-    colors = [pygame.Color(235, 236, 208), pygame.Color(119, 149, 86)]
+# Create the display window
+screen = pg.display.set_mode((WIDTH, HEIGHT))
+pg.display.set_caption('Chess Board')
+
+# Function to draw the chessboard
+def draw_board(board):
+    colors = [LIGHT_SQUARE_COLOR, DARK_SQUARE_COLOR]
     for i in range(8):
         for j in range(8):
             color = colors[(i + j) % 2]
-            pygame.draw.rect(window, color, pygame.Rect(j * square_size, i * square_size, square_size, square_size))
+            pg.draw.rect(screen, color, (j * SQUARE_SIZE, i * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE))
+
             piece = board.board[i][j].piece
-            if piece:
-                piece_type = type(piece).__name__.lower()
-                piece_color = piece.color
-                window.blit(piece_images[f'{piece_color}-{piece_type}'], (j * square_size, i * square_size))
+            piece_image = None
+            if piece is not None:
+                piece_name = f"{piece.color[0]}_{type(piece).__name__}"
+                piece_image = pg.transform.smoothscale(img_dict[piece_name], (SQUARE_SIZE, SQUARE_SIZE))
+            if piece_image is not None and type(piece).__name__ == "Pawn":
+                screen.blit(piece_image, (j * SQUARE_SIZE - 2, i * SQUARE_SIZE))
+            elif piece_image is not None and type(piece).__name__ != "Pawn":
+                screen.blit(piece_image, (j * SQUARE_SIZE, i * SQUARE_SIZE))
 
-# Handle user input
-def get_square_under_mouse():
-    mouse_pos = pygame.mouse.get_pos()
-    x, y = mouse_pos[0] // square_size, mouse_pos[1] // square_size
-    return y, x
+def main():
+    # Main loop
+    board = Board()
+    running = True
+    selected = ()
+    clicks = [] # Will contain both of the user's clicks
 
-def handle_click(board, selected_square, valid_moves):
-    if pygame.mouse.get_pressed()[0]:
-        rank, column = get_square_under_mouse()
-        piece = board.board[rank][column].piece
-        if selected_square is None:
-            if piece and piece.color == current_turn:
-                selected_square = (rank, column)
-                valid_moves = piece.validMoves
-        else:
-            if (rank, column) in valid_moves:
-                board.board[selected_square[0]][selected_square[1]].piece.move(rank, column)
-                selected_square = None
-                valid_moves = []
-                switch_turn()
-            else:
-                selected_square = None
-                valid_moves = []
-    return selected_square, valid_moves
+    while running:
+        for event in pg.event.get():
+            # User exits the game
+            if event.type == QUIT:
+                running = False
+            
+            # User clicks
+            elif event.type == MOUSEBUTTONDOWN:
+                location = pg.mouse.get_pos()
+                col = location[0] // SQUARE_SIZE
+                row = location[1] // SQUARE_SIZE
 
-def switch_turn():
-    global current_turn
-    current_turn = "black" if current_turn == "white" else "white"
+                # The same square was clicked twice in a row
+                if (row, col) == selected:
+                    selected = () # Deselect the square
+                    clicks = []
+                elif (selected == () and board.board[row][col].piece is not None) or selected != ():
+                    selected = (row, col)
+                    clicks.append(selected)
 
-board = Board()
-selected_square = None
-valid_moves = []
-global current_turn
-current_turn = "white"
+                # We attempt to move to the newly selected square
+                if len(clicks) == 2:
+                    prevRow, prevCol = clicks[0]
+                    newRow, newCol = clicks[1]
+                    board.board[prevRow][prevCol].piece.move(newRow, newCol)
+                    selected = ()
+                    clicks = []
 
-run = True
-while run:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            run = False
-    
-    selected_square, valid_moves = handle_click(board, selected_square, valid_moves)
+        screen.fill(WHITE)  # Fill the background with white
+        draw_board(board)  # Draw the chessboard
+        
+        pg.display.flip()
 
-    draw_board(window, board)
-    pygame.display.flip()
+main()
 
-pygame.quit()
-'''
+# Quit pygame
+pg.quit()
 
 
-board = Board()
+# board = Board()
 
 '''
 board.board[6][4].piece.move(4, 4) # e4
@@ -129,6 +148,7 @@ board.board[7][5].piece.move(7, 4) # Re1
 board.board[0][4].piece.move(0, 2) # 0-0-0
 '''
 
+'''
 board.board[6][4].piece.move(5, 4) # e3
 board.board[1][0].piece.move(3, 0) # a5
 board.board[7][3].piece.move(3, 7) # Qh5
@@ -148,6 +168,7 @@ board.board[5][3].piece.move(1, 7) # Qh7
 board.board[0][1].piece.move(0, 2) # Qxc8
 board.board[1][5].piece.move(2, 6) # Kg6
 board.board[0][2].piece.move(2, 4) # Qe6
+'''
 
 '''
 board.board[7][1].piece.move(5, 2) # Nc3
@@ -254,4 +275,4 @@ board.board[7][1].piece.move(5, 2) # Nc3
 board.board[0][1].piece.move(2, 2) # Nc6
 '''
 
-board.printBoard()
+# board.printBoard()
