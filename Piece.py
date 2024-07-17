@@ -6,9 +6,8 @@ class Piece(ABC):
         self.rank = rank
         self.column = column
         self.board = board # The piece's Board instance
-
-        # A list of valid moves before taking into account checks or pins
-        self.validMoves = []
+        self.validMoves = [] # The piece's valid moves before accounting for checks or pins
+        self.legalMoves = [] # The piece's actual legal moves
     
     def printAttr(self):
         '''
@@ -19,25 +18,28 @@ class Piece(ABC):
     def move(self, moveRank, moveColumn):
         moveToPiece = self.board.board[moveRank][moveColumn].piece
         # self.board.printBoard()
-        if self.isLegal(moveRank, moveColumn):
+        if (moveRank, moveColumn) in self.legalMoves:
+            # Make the move
+            self.board.updateBoard(self.rank, self.column, moveRank, moveColumn)
+            self.rank = moveRank
+            self.column = moveColumn
+
+            # Refind the valid and legal moves after the move is made
+            self.board.findAllValidMoves()
+            self.board.findAllLegalMoves()
+
+            # Check for any possible endings (checkmate, 3-move rep, etc)
             self.board.checkEndings(self, moveToPiece)
         else:
             print(f"Illegal move: {type(self).__name__} {self.rank, self.column} to {moveRank, moveColumn}")
     
-    def isLegal(self, moveRank, moveColumn, movePiecesBack=False, ignoreValidity=False):
+    def isLegal(self, moveRank, moveColumn):
         '''
         Given the move coordinates, this function returns whether the move
         is legal or not. If the move is legal, it plays the move and returns
         True. Otherwise, it returns False.
-        If the movePiecesBack flag is set to True, then the board will be reset
-        no matter if the move is legal or not.
-        If the ignoreValidity flag is set to True, then it doesn't matter if 
-        the given move is in validMoves or not.
         '''
         assert moveRank > -1 and moveRank < 8 and moveColumn > -1 and moveColumn < 8, "move out of bounds"
-
-        if not ignoreValidity and (moveRank, moveColumn) not in self.validMoves:
-            return False
 
         # Store the piece on the square we're moving to
         moveToPiece = self.board.board[moveRank][moveColumn].piece
@@ -48,22 +50,29 @@ class Piece(ABC):
         self.board.updateBoard(self.rank, self.column, moveRank, moveColumn)
         self.rank = moveRank
         self.column = moveColumn
+
+        # Find the valid moves of the new position
         self.board.findAllValidMoves()
 
         # Check if after the move our king is in check
         inCheck = self.board.isKingInCheck(self.color)
 
-        # Reset board to position before move if illegal move or flag was used
-        if inCheck or movePiecesBack:
-            self.rank = oldRank
-            self.column = oldColumn
-            self.board.board[self.rank][self.column].piece = self
-            self.board.board[moveRank][moveColumn].piece = moveToPiece
+        # Reset old position
+        self.rank = oldRank
+        self.column = oldColumn
+        self.board.board[self.rank][self.column].piece = self
+        self.board.board[moveRank][moveColumn].piece = moveToPiece
         
-        # Reset the valid moves
+        # Reset valid moves
         self.board.findAllValidMoves()
 
         return not inCheck
+
+    def findLegalMoves(self):
+        self.legalMoves = [] # Reset legal moves
+        for validMove in self.validMoves:
+            if self.isLegal(validMove[0], validMove[1]):
+                self.legalMoves.append(validMove)
     
     @abstractmethod
     def findValidMoves(self):

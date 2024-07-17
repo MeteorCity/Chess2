@@ -14,6 +14,7 @@ class Board:
         self.board = [[None for _ in range(8)] for _ in range(8)]
         self.setupBoard()
         self.findAllValidMoves()
+        self.findAllLegalMoves()
         self.positions = defaultdict(int)
         self.fiftyMoveCounter = 0
     
@@ -70,6 +71,17 @@ class Board:
                 if piece is not None:
                     piece.findValidMoves()
     
+    def findAllLegalMoves(self):
+        '''
+        Finds all the valid moves for every piece. Called after finding all
+        the valid moves.
+        '''
+        for i in range(8):
+            for j in range(8):
+                piece = self.board[i][j].piece
+                if piece is not None:
+                    piece.findLegalMoves()
+    
     def printBoard(self):
         '''
         Prints the board out for debugging purposes.
@@ -93,14 +105,11 @@ class Board:
         self.board[orig_rank][orig_column].piece = None
         self.board[new_rank][new_column].piece = piece
     
-    def kingHelper(self, color):
+    def isKingInCheck(self, color):
         '''
-        A helper function for the inCheck and inCheckmate functions.
-        Returns the squares the opponent is attacking and the King object
-        of the given color.
+        Returns True or False based on whether the king of the passed
+        in color is in check or not.
         '''
-        assert color == "white" or color == "black", "color must be white or black"
-
         oppAttacks = []
         king = None
 
@@ -112,14 +121,6 @@ class Board:
                     king = piece
         
         assert king is not None, "King is missing from the board"
-        return oppAttacks, king
-    
-    def isKingInCheck(self, color):
-        '''
-        Returns True or False based on whether the king of the passed
-        in color is in check or not.
-        '''
-        oppAttacks, king = self.kingHelper(color)
         return (king.rank, king.column) in oppAttacks
     
     def isKingInCheckmate(self, color):
@@ -127,21 +128,14 @@ class Board:
         Returns True or False based on whether the king of the passed
         in color is in checkmate or not.
         '''
-        oppAttacks, king = self.kingHelper(color)
-        
-        # King in check
-        if (king.rank, king.column) in oppAttacks:
-            for i in range(-1, 2):
-                for j in range(-1, 2):
-                    # Exclude king's starting square
-                    if i == 0 and j == 0:
-                        continue
-                    
-                    if (0 <= king.rank + i <= 7 and 0 <= king.column + j <= 7 and
-                    king.isLegal(king.rank + i, king.column + j, True)):
-                        return False
-        else:
+        if not self.isKingInCheck(color):
             return False
+
+        for i in range(8):
+            for j in range(8):
+                if (piece := self.board[i][j].piece) and piece.color == color:
+                    if piece.legalMoves: # There are legal moves
+                        return False
 
         return True
     
@@ -156,9 +150,8 @@ class Board:
         for i in range(8):
             for j in range(8):
                 if (piece := self.board[i][j].piece) and piece.color == color:
-                    for validMoveRank, validMoveCol in piece.validMoves:
-                        if piece.isLegal(validMoveRank, validMoveCol, True):
-                            return False
+                    if piece.legalMoves: # There are legal moves
+                        return False
 
         return True
     
