@@ -181,13 +181,20 @@ class Board:
         # If the king is currently in check, return False
         if self.isKingInCheck(color):
             return False
+        
+        # Calculate opponent attacks
+        oppAttacks = []
+        for i in range(8):
+            for j in range(8):
+                if (piece := self.board[i][j].piece) and piece.color != color:
+                    oppAttacks.extend(piece.validMoves)
 
         # If there are pieces in the way or the king will castle into
         # or through check, return False
         for i in range(1, 3):
             offset = i if side == "kingside" else -i
             if (self.board[rank][4 + offset].piece is not None or
-                not king.isLegal(rank, 4 + offset, True, True)):
+                (rank, 4 + offset) in oppAttacks):
                 return False
         
         return True

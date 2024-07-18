@@ -47,7 +47,3 @@ class Rook(Piece):
                     self.validMoves.append((self.rank, self.column - j))
                 if piece: # Stop searching past the found piece
                     break
-    
-    def move(self, moveRank, moveColumn):
-        super().move(moveRank, moveColumn)
-        self.has_moved = True

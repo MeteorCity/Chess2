@@ -14,6 +14,7 @@ class King(Piece):
         '''
         self.validMoves = [] # Reset valid moves
 
+        # Add regular king moves
         for i in range(-1, 2):
             for j in range(-1, 2):
                 # Exclude king's starting square
@@ -25,14 +26,20 @@ class King(Piece):
                     if not piece or piece.color != self.color:
                         self.validMoves.append((self.rank + i, self.column + j))
         
+        # Add castling moves
+        rank = 0 if self.color == "black" else 7
+        if self.board.canCastle(f"{self.color}", "queenside"):
+            self.validMoves.append((rank, 2))
+        if self.board.canCastle(f"{self.color}", "kingside"):
+            self.validMoves.append((rank, 6))
+        
     def move(self, moveRank, moveColumn):
         '''
         Overrides the move function of the piece class such that castling
         can be implemented.
         '''
         # Queenside castle
-        if (self.rank == moveRank and self.column - moveColumn == 2 and
-        self.board.canCastle(f"{self.color}", "queenside")):
+        if (moveRank, moveColumn) in self.legalMoves and self.column - moveColumn == 2:
             # Update king's position
             self.board.updateBoard(self.rank, self.column, moveRank, moveColumn)
             self.column = moveColumn
@@ -42,12 +49,12 @@ class King(Piece):
             self.board.updateBoard(rook.rank, rook.column, self.rank, 3)
             rook.column = 3
             
-            # Find new valid moves
+            # Find new valid and legal moves
             self.board.findAllValidMoves()
+            self.board.findAllLegalMoves()
         
         # Kingside Castle
-        elif (self.rank == moveRank and self.column - moveColumn == -2 and
-        self.board.canCastle(f"{self.color}", "kingside")):
+        elif (moveRank, moveColumn) in self.legalMoves and self.column - moveColumn == -2:
             # Update king's position
             self.board.updateBoard(self.rank, self.column, moveRank, moveColumn)
             self.column = moveColumn
@@ -59,9 +66,8 @@ class King(Piece):
 
             # Find new valid moves
             self.board.findAllValidMoves()
+            self.board.findAllLegalMoves()
 
         # Non-castle move
         else:
             super().move(moveRank, moveColumn)
-        
-        self.has_moved = True

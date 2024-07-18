@@ -24,6 +24,10 @@ class Piece(ABC):
             self.rank = moveRank
             self.column = moveColumn
 
+            # Set the has_moved flag to true for the king and rook if either moved
+            if type(self).__name__ == "King" or type(self).__name__ == "Rook":
+                self.has_moved = True
+
             # Refind the valid and legal moves after the move is made
             self.board.findAllValidMoves()
             self.board.findAllLegalMoves()
