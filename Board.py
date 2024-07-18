@@ -234,6 +234,24 @@ class Board:
             fen[i] += "/"
         
         return "".join(fen)[:-1]
+
+    def hasInsufMaterial(self, color):
+        '''
+        Returns True or Falsed based on whether the given color has
+        insufficient mating material.
+        '''
+        pieces = []
+        for i in range(8):
+            for j in range(8):
+                if (piece := self.board[i][j].piece) and piece.color == color:
+                    pieces.append(type(piece).__name__)
+        
+        pieces.remove("King")
+        if (pieces == [] or pieces == ["Bishop"] or pieces == ["Knight"] or
+            pieces == ["Knight", "Knight"]):
+            return True
+        
+        return False
     
     def checkEndings(self, piece, moveToPiece):
         '''
@@ -246,16 +264,19 @@ class Board:
         # Checkmate
         if self.isKingInCheckmate(oppositeColor):
             print(f"{oppositeColor} is in checkmate!")
+            return True
 
         # Stalemate
         if self.isKingInStalemate(oppositeColor):
             print(f"{oppositeColor} is in stalemate!")
+            return True
         
         # 3-move repetition
         fenString = self.posToFEN(self.board)
         self.positions[fenString] += 1
         if self.positions[fenString] == 3:
             print("Game is a draw by 3-time position repeat.")
+            return True
 
         # 50-move draw
         if moveToPiece is not None or type(piece).__name__ == "Pawn":
@@ -264,3 +285,9 @@ class Board:
             self.fiftyMoveCounter += 0.5
         if self.fiftyMoveCounter == 50:
             print("Game is a draw by 50-move rule.")
+            return True
+
+        # Insufficient material
+        if self.hasInsufMaterial("white") and self.hasInsufMaterial("black"):
+            print("Game is a draw due to insufficient mating material")
+            return True

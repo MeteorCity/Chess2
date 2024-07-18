@@ -40,8 +40,7 @@ class Piece(ABC):
     def isLegal(self, moveRank, moveColumn):
         '''
         Given the move coordinates, this function returns whether the move
-        is legal or not. If the move is legal, it plays the move and returns
-        True. Otherwise, it returns False.
+        is legal or not.
         '''
         assert moveRank > -1 and moveRank < 8 and moveColumn > -1 and moveColumn < 8, "move out of bounds"
 

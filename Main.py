@@ -1,9 +1,5 @@
 import pygame as pg
 from pygame.locals import *
-import sys
-import chess
-import chess.svg
-import io
 
 from Board import Board
 
